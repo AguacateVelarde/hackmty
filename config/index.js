@@ -2,11 +2,11 @@ module.exports = {
   production : false,
   login : true,
   mysql : {
-    user : 'admin',
-    password : 'hackMty.1',
-    database : '',
-    port : 3304,
-    host : 'kompas.cro0pzwm9zfp.us-west-1.rds.amazonaws.com'
+    user : 'root',
+    password : 'G1uFpt4KkqM3Ar1j',
+    database : 'kompass',
+    port : 3306,
+    host : '35.199.105.137'
   },
   domain : 'http://localhost',
   unAuthPaths : [
