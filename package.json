@@ -1,0 +1,24 @@
+{
+  "name": "kompas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@kompass/api": "file:api",
+    "@kompass/config": "file:config",
+    "@kompass/database": "file:database",
+    "@kompass/middlewares": "file:middlewares",
+    "bcrypt": "^3.0.6",
+    "cli-table": "^0.3.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.19.2",
+    "mysql": "^2.17.1"
+  }
+}
