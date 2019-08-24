@@ -2,18 +2,19 @@
 const fs = require('fs')
 const jwt = require ('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const { login, domain } = require('@taftrip/config')
+const { login, domain } = require('@kompass/config')
 const { Router } = require('express')
-const { mysql } = require('@kompass/databases')
+const { db } = require('@kompass/database')
 const path = require('path')
 const router = Router()
 
-router.post('/', (req, res)=>{
+router.post('/login', (req, res)=>{
   if( login ){
-    mysql.select('*')
-    .where( 'email', req.body.user )
-    .from('Usuario')
+    db.select('*')
+    .where( 'rfc', req.body.user )
+    .from('usuario')
     .then( user =>{
+      //console.log(user)
       if( user.length === 0 )
       return res.status(401).json({
         message : 'User don\'t foud',
@@ -27,7 +28,9 @@ router.post('/', (req, res)=>{
               message : 'Server Error',
               code : 5002
             })
-          bcrypt.compare(req.body.password, user[0].password)
+            bcrypt.hash(req.body.password, 10)
+            .then(r => console.log(r))
+          bcrypt.compare(req.body.password, user[0].contrasena)
           .then( passVerify =>{
             if( !passVerify )
               return res.status( 400 ).json({
@@ -36,7 +39,7 @@ router.post('/', (req, res)=>{
               })
               var payload = {
                 user : user[0],
-                date : Date.now()
+                //date : Date.now()
               }
               var signOptions = {
                 issuer: 	"Taftrip Corp",
@@ -46,7 +49,6 @@ router.post('/', (req, res)=>{
                 algorithm: 	"RS256"
               }
               var _token = jwt.sign(payload, _private, signOptions)
-
               res.status( 200 ).json({
                 message : 'Ok',
                 token : _token,
@@ -64,7 +66,7 @@ router.post('/', (req, res)=>{
     }).catch( err =>{
       return res.status(500).json({
         message : 'Server Error',
-        code : 5002,
+        code : 5055,
         err
       })
     })
