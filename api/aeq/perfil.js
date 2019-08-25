@@ -43,12 +43,7 @@ var mejorCliente = function(req, res) {
 var gastoGrande = function(req, res) {
     console.log("Entre al gasta mas grande");
     var { user } = req.payload
-    db.select('receptorname', 'emisorrfc', 'total').
-    from('clientes').
-    where('emisorrfc', '=', user.rfc).
-    whereNotNull('receptorname').
-    andWhere('receptorname', '<>', " ").
-    orderBy('total', 'desc').
+    db.raw('select receptorname, emisorrfc, total from clientes where (emisorrfc = "' + user.rfc + '" and receptorname is not null and receptorname <> " ") order by total desc limit 1').
     then(datos => {
         if (datos.length === 0) {
             return res.status(401).json({
@@ -63,7 +58,7 @@ var gastoGrande = function(req, res) {
 var menorGasto = function(req, res) {
     console.log("Entre al gasta mas grande");
     var { user } = req.payload
-    db.raw('select receptorname, total from clientes where emisorrfc = "PST1205156S0" order by total asc').
+    db.raw('select receptorname, total from clientes where emisorrfc = "PST1205156S0" order by total asc limit 1').
     then(datos => {
         if (datos.length === 0) {
             return res.status(401).json({
@@ -165,6 +160,12 @@ var ivaAPagar = function(req, res) {
 var perfil = function(req, res) {
     var mejCli;
     var mejCliMount;
+    var vGEmi;
+    var vGTotal;
+    var minGEmi;
+    var minGTotal;
+    var mayGRec;
+    var mayGTotal;
     console.log("Entre al mejor Cliente");
     var { user } = req.payload
     db.raw('select emisorname, sum(total) as TotalClientes from clientes where receptorrfc = "' + user.rfc + '" group by emisorname order by TotalClientes desc limit 1').
@@ -177,12 +178,7 @@ var perfil = function(req, res) {
         } else {
             mejCli = datos[0][0]['emisorname'];
             mejCliMount = datos[0][0]['TotalClientes'];
-            db.select('receptorrfc', 'emisorname', 'total').
-            from('clientes').
-            whereNotNull('emisorname').
-            andWhere('emisorname', '<>', " ").
-            andWhere('receptorrfc', '=', user.rfc).
-            orderByRaw('total desc').
+            db.raw('select receptorrfc, emisorname, total from clientes where (receptorrfc = "' + user.rfc + '" and emisorname is not null and emisorname <> " ") order by total desc limit 1;').
             then(datos => {
                 if (datos.length === 0) {
                     return res.status(401).json({
@@ -190,7 +186,51 @@ var perfil = function(req, res) {
                         code: 401
                     })
                 } else {
-                    res.status(200).json(datos);
+                    var vGEmi = datos[0][0]['emisorname']
+                    var vGTotal = datos[0][0]['total']
+                    db.raw('select receptorname, total from clientes where emisorrfc = "PST1205156S0" order by total asc limit 1').
+                    then(datos => {
+                        if (datos.length === 0) {
+                            return res.status(401).json({
+                                message: 'User don\'t foud',
+                                code: 401
+                            })
+                        } else {
+                            minGEmi = datos[0][0]['receptorname'];
+                            minGTotal = datos[0][0]['total']
+                            db.raw('select receptorname, emisorrfc, total from clientes where (emisorrfc = "' + user.rfc + '" and receptorname is not null and receptorname <> " ") order by total desc limit 1').
+                            then(datos => {
+                                if (datos.length === 0) {
+                                    return res.status(401).json({
+                                        message: 'User don\'t foud',
+                                        code: 401
+                                    })
+                                } else {
+                                    mayGRec = datos[0][0]['receptorname'];
+                                    mayGTotal = datos[0][0]['total']
+                                    var envio = {
+                                        "mejorCliente": {
+                                            "MejorCliente": mejCli,
+                                            "Total": mejCliMount
+                                        },
+                                        "ventaGrande": {
+                                            "ClienteVentaGrande": vGEmi,
+                                            "Total": vGTotal
+                                        },
+                                        "mayorGasto": {
+                                            "ReceptorMayorGasto": mayGRec,
+                                            "Total": mayGTotal
+                                        },
+                                        "menorGasto": {
+                                            "ClienteMenorGasto": minGEmi,
+                                            "Total": minGTotal
+                                        }
+                                    }
+                                    res.status(200).json(envio);
+                                }
+                            })
+                        }
+                    })
                 }
             })
         }
@@ -204,5 +244,6 @@ module.exports = {
     proovedorGrande,
     ivaCobrado,
     ivaPagado,
-    ivaAPagar
+    ivaAPagar,
+    perfil
 };

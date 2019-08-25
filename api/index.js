@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const router = Router()
 const loginApi = require('./auth/login.js')
-const { ventaGrande, mejorCliente, gastoGrande, menorGasto, proovedorGrande, ivaCobrado, ivaPagado, ivaAPagar } = require('./aeq/perfil.js')
+const { ventaGrande, mejorCliente, gastoGrande, menorGasto, proovedorGrande, ivaCobrado, ivaPagado, ivaAPagar, perfil } = require('./aeq/perfil.js')
 const { getGastos, getVentas, getGanancias, numProvedores } = require('./aeq/factura.js')
 const { topClientes, getClientes, topUbicaciones } = require('./lucia/cliente.js')
 
@@ -31,6 +31,8 @@ router.get('/ivaCobrado', ivaCobrado)
 router.get('/ivaPagado', ivaPagado)
 
 router.get('/ivAPagar', ivaAPagar)
+
+router.get('/perfil', perfil)
 
 //Página Factura
 router.get('/getGastos', getGastos)
