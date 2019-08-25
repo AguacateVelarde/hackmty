@@ -93,10 +93,29 @@ var numProvedores = function(req, res) {
         }
     });
 };
+var numClientes = function(req, res) {
+    var { user } = req.payload;
+    db.raw('select count(emisorrfc) as NumClientes from clientes where receptorrfc = "' + user.rfc + '"').
+    then(datos => {
+        if (datos.length === 0) {
+            return res.status(401).json({
+                message: 'User don\'t foud',
+                code: 401
+            })
+        } else {
+            var dato = datos[0][0]['NumClientes'];
+            var envio = {
+                "NumClientes": dato
+            }
+            res.status(200).json(envio);
+        }
+    });
+}
 
 module.exports = {
     getGastos,
     getVentas,
     getGanancias,
-    numProvedores
+    numProvedores,
+    numClientes
 };
