@@ -64,9 +64,11 @@ var getGanancias = function(req, res) {
                     ventas = datos[0][0]['VentasTotales'];
                     var gan = ventas - gastos;
                     var envio = {
-                        "Ganancias": gan
+                        "Ganancias": gan,
+                        "Ventas": ventas,
+                        "Gastos": gastos
                     }
-                    res.status(200).json(gan);
+                    res.status(200).json(envio);
                     console.log(gan);
                 }
             });

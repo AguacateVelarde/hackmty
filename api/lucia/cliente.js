@@ -55,10 +55,24 @@ var clienteGrande = function(req, res) {
     });
 }
 var topUbicaciones = function(req, res) {
+
     var { user } = req.payload;
+    db.raw('select placegenerated, count(placegenerated) as Cuenta from clientes where rfc = "' + user.rfc + '" group by placegenerated order by Cuenta desc limit 3').
+    then(datos => {
+        if (datos.length === 0) {
+            return res.status(401).json({
+                message: 'User don\'t foud',
+                code: 401
+            })
+        } else {
+            res.status(200).json(datos);
+
+        }
+    });
 
 }
 module.exports = {
     topClientes,
-    getClientes
+    getClientes,
+    topUbicaciones
 };

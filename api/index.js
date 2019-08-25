@@ -3,7 +3,7 @@ const router = Router()
 const loginApi = require('./auth/login.js')
 const { ventaGrande, mejorCliente, gastoGrande, menorGasto, proovedorGrande, ivaCobrado, ivaPagado, ivaAPagar } = require('./aeq/perfil.js')
 const { getGastos, getVentas, getGanancias, numProvedores } = require('./aeq/factura.js')
-const { topClientes, getClientes } = require('./lucia/cliente.js')
+const { topClientes, getClientes, topUbicaciones } = require('./lucia/cliente.js')
 
 /*const refresher = require( './auth/refresher.js')
 const { register, verifyUnique } = require('./auth/register.js')*/
@@ -40,4 +40,5 @@ router.get('/numProve', numProvedores)
     //Página de Clientes
 router.get('/topClientes', topClientes)
 router.get('/getClientes', getClientes)
+router.get('/topUbicacion', topUbicaciones)
 module.exports = router;
