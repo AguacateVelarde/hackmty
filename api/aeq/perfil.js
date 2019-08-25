@@ -88,6 +88,7 @@ var proovedorGrande = function(req, res) {
                 code: 401
             })
         } else {
+            console.log(datos[0]['receptorname']);
             res.status(200).json(datos);
         }
     })
@@ -168,6 +169,8 @@ var perfil = function(req, res) {
     var mayGTotal;
     var ivaCobrado;
     var ivaPagado;
+    var proveG;
+    var proveGGastos;
     console.log("Entre al mejor Cliente");
     var { user } = req.payload
     db.raw('select emisorname, sum(total) as TotalClientes from clientes where receptorrfc = "' + user.rfc + '" group by emisorname order by TotalClientes desc limit 1').
@@ -228,27 +231,50 @@ var perfil = function(req, res) {
                                                     })
                                                 } else {
                                                     ivaPagado = datos[0][0]['IvaPagado']
-                                                    var envio = {
-                                                        "mejorCliente": {
-                                                            "MejorCliente": mejCli,
-                                                            "Total": mejCliMount
-                                                        },
-                                                        "ventaGrande": {
-                                                            "ClienteVentaGrande": vGEmi,
-                                                            "Total": vGTotal
-                                                        },
-                                                        "mayorGasto": {
-                                                            "ReceptorMayorGasto": mayGRec,
-                                                            "Total": mayGTotal
-                                                        },
-                                                        "menorGasto": {
-                                                            "ClienteMenorGasto": minGEmi,
-                                                            "Total": minGTotal
-                                                        },
-                                                        "ivaPagado": ivaPagado,
-                                                        "ivaCobrado": ivaCobrado
-                                                    }
-                                                    res.status(200).json(envio);
+                                                    db.select('receptorname').
+                                                    sum('total as Gastos').
+                                                    from('clientes').
+                                                    where('emisorrfc', '=', user.rfc).
+                                                    whereNotNull('receptorname').
+                                                    andWhere('receptorname', '<>', " ").
+                                                    groupBy('receptorname').
+                                                    orderByRaw('Gastos desc').
+                                                    then(datos => {
+                                                        if (datos.length === 0) {
+                                                            return res.status(401).json({
+                                                                message: 'User don\'t foud',
+                                                                code: 401
+                                                            })
+                                                        } else {
+                                                            proveG = datos[0]['receptorname'];
+                                                            proveGGastos = datos[0]['Gastos']
+                                                            var envio = {
+                                                                "mejorCliente": {
+                                                                    "MejorCliente": mejCli,
+                                                                    "Total": mejCliMount
+                                                                },
+                                                                "ventaGrande": {
+                                                                    "ClienteVentaGrande": vGEmi,
+                                                                    "Total": vGTotal
+                                                                },
+                                                                "mayorGasto": {
+                                                                    "ReceptorMayorGasto": mayGRec,
+                                                                    "Total": mayGTotal
+                                                                },
+                                                                "menorGasto": {
+                                                                    "ClienteMenorGasto": minGEmi,
+                                                                    "Total": minGTotal
+                                                                },
+                                                                "ivaPagado": ivaPagado,
+                                                                "ivaCobrado": ivaCobrado,
+                                                                "proveedorGrande": {
+                                                                    "NombreProveedor": proveG,
+                                                                    "Gastos": proveGGastos
+                                                                }
+                                                            }
+                                                            res.status(200).json(envio);
+                                                        }
+                                                    })
                                                 }
                                             })
                                         }

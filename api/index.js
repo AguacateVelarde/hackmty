@@ -15,7 +15,7 @@ router.post('/login', loginApi)
 router.get('/online', (req, res) => {
         res.json({ x: 'hi' })
     })
-    //Página CLIENTE
+    //Página Perfil
 router.get('/ventaGrande', ventaGrande)
 
 router.get('/mejorCliente', mejorCliente)
