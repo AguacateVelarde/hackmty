@@ -10,7 +10,7 @@ const router = Router()
 
 var IP;
 var IC;
-var clienteApi = function(req, res) {
+var ventaGrande = function(req, res) {
     console.log("Entre");
     var { user } = req.payload
     db.select('receptorrfc', 'emisorname', 'total').
@@ -104,10 +104,11 @@ var ivaCobrado = function(req, res) {
                 code: 401
             })
         } else {
+            IC = datos[0][0]['IvaCobrado'];
             res.status(200).json(datos);
         }
-    })
-}
+    });
+};
 var ivaPagado = function(req, res) {
     var { user } = req.payload
     console.log("Entre al iva pagado");
@@ -124,12 +125,45 @@ var ivaPagado = function(req, res) {
             console.log(IP);
         }
     })
+};
+var ivaAPagar = function(req, res) {
+    var { user } = req.payload
+    console.log("Entre al iva cobrado");
+    db.raw('select (sum(total)-sum(subtotal)) as IvaCobrado from clientes where receptorrfc = "' + user.rfc + '"').
+    then(datos => {
+        if (datos.length === 0) {
+            return res.status(401).json({
+                message: 'User don\'t foud',
+                code: 401
+            })
+        } else {
+            IC = datos[0][0]['IvaCobrado'];
+            console.log("Entre al iva pagado");
+            db.raw('select (sum(total)-sum(subtotal)) as IvaPagado from clientes where emisorrfc = "' + user.rfc + '"').
+            then(datos => {
+                if (datos.length === 0) {
+                    return res.status(401).json({
+                        message: 'User don\'t foud',
+                        code: 401
+                    })
+                } else {
+                    IP = datos[0][0]['IvaPagado']
+                    var IAP = IC - IP;
+                    var enviado = {
+                        "Iva A Pagar": IAP
+                    }
+                    res.status(200).json(IAP);
+                }
+            })
+        }
+    });
 }
 module.exports = {
     mejorCliente,
-    clienteApi,
+    ventaGrande,
     gastoGrande,
     proovedorGrande,
     ivaCobrado,
-    ivaPagado
+    ivaPagado,
+    ivaAPagar
 };

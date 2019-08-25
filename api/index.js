@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const router = Router()
 const loginApi = require('./auth/login.js')
-const { clienteApi, mejorCliente, gastoGrande, proovedorGrande, ivaCobrado, ivaPagado } = require('./aeq/perfil.js')
+const { ventaGrande, mejorCliente, gastoGrande, proovedorGrande, ivaCobrado, ivaPagado, ivaAPagar } = require('./aeq/perfil.js')
 const { getGastos, getVentas, getGanancias, numProvedores } = require('./aeq/factura.js')
 const { topClientes, getClientes } = require('./lucia/cliente.js')
 
@@ -16,7 +16,7 @@ router.get('/online', (req, res) => {
         res.json({ x: 'hi' })
     })
     //Página CLIENTE
-router.get('/ventaGrande', clienteApi)
+router.get('/ventaGrande', ventaGrande)
 
 router.get('/mejorCliente', mejorCliente)
 
@@ -27,6 +27,8 @@ router.get('/proovedorGrande', proovedorGrande)
 router.get('/ivaCobrado', ivaCobrado)
 
 router.get('/ivaPagado', ivaPagado)
+
+router.get('/ivAPagar', ivaAPagar)
 
 //Página Factura
 router.get('/getGastos', getGastos)
