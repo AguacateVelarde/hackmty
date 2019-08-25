@@ -166,6 +166,8 @@ var perfil = function(req, res) {
     var minGTotal;
     var mayGRec;
     var mayGTotal;
+    var ivaCobrado;
+    var ivaPagado;
     console.log("Entre al mejor Cliente");
     var { user } = req.payload
     db.raw('select emisorname, sum(total) as TotalClientes from clientes where receptorrfc = "' + user.rfc + '" group by emisorname order by TotalClientes desc limit 1').
@@ -208,25 +210,49 @@ var perfil = function(req, res) {
                                 } else {
                                     mayGRec = datos[0][0]['receptorname'];
                                     mayGTotal = datos[0][0]['total']
-                                    var envio = {
-                                        "mejorCliente": {
-                                            "MejorCliente": mejCli,
-                                            "Total": mejCliMount
-                                        },
-                                        "ventaGrande": {
-                                            "ClienteVentaGrande": vGEmi,
-                                            "Total": vGTotal
-                                        },
-                                        "mayorGasto": {
-                                            "ReceptorMayorGasto": mayGRec,
-                                            "Total": mayGTotal
-                                        },
-                                        "menorGasto": {
-                                            "ClienteMenorGasto": minGEmi,
-                                            "Total": minGTotal
+                                    db.raw('select (sum(total)-sum(subtotal)) as IvaCobrado from clientes where receptorrfc = "' + user.rfc + '"').
+                                    then(datos => {
+                                        if (datos.length === 0) {
+                                            return res.status(401).json({
+                                                message: 'User don\'t foud',
+                                                code: 401
+                                            })
+                                        } else {
+                                            ivaCobrado = datos[0][0]['IvaCobrado'];
+                                            db.raw('select (sum(total)-sum(subtotal)) as IvaPagado from clientes where emisorrfc = "' + user.rfc + '"').
+                                            then(datos => {
+                                                if (datos.length === 0) {
+                                                    return res.status(401).json({
+                                                        message: 'User don\'t foud',
+                                                        code: 401
+                                                    })
+                                                } else {
+                                                    ivaPagado = datos[0][0]['IvaPagado']
+                                                    var envio = {
+                                                        "mejorCliente": {
+                                                            "MejorCliente": mejCli,
+                                                            "Total": mejCliMount
+                                                        },
+                                                        "ventaGrande": {
+                                                            "ClienteVentaGrande": vGEmi,
+                                                            "Total": vGTotal
+                                                        },
+                                                        "mayorGasto": {
+                                                            "ReceptorMayorGasto": mayGRec,
+                                                            "Total": mayGTotal
+                                                        },
+                                                        "menorGasto": {
+                                                            "ClienteMenorGasto": minGEmi,
+                                                            "Total": minGTotal
+                                                        },
+                                                        "ivaPagado": ivaPagado,
+                                                        "ivaCobrado": ivaCobrado
+                                                    }
+                                                    res.status(200).json(envio);
+                                                }
+                                            })
                                         }
-                                    }
-                                    res.status(200).json(envio);
+                                    });
                                 }
                             })
                         }
