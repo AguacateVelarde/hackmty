@@ -54,6 +54,10 @@ var clienteGrande = function(req, res) {
         }
     });
 }
+var topUbicaciones = function(req, res) {
+    var { user } = req.payload;
+
+}
 module.exports = {
     topClientes,
     getClientes

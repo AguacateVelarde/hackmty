@@ -64,6 +64,21 @@ var gastoGrande = function(req, res) {
             res.status(200).json(datos);
         }
     })
+};
+var menorGasto = function(req, res) {
+    console.log("Entre al gasta mas grande");
+    var { user } = req.payload
+    db.raw('select receptorname, total from clientes where emisorrfc = "PST1205156S0" order by total asc').
+    then(datos => {
+        if (datos.length === 0) {
+            return res.status(401).json({
+                message: 'User don\'t foud',
+                code: 401
+            })
+        } else {
+            res.status(200).json(datos);
+        }
+    })
 }
 var proovedorGrande = function(req, res) {
     var { user } = req.payload
@@ -156,6 +171,7 @@ module.exports = {
     mejorCliente,
     ventaGrande,
     gastoGrande,
+    menorGasto,
     proovedorGrande,
     ivaCobrado,
     ivaPagado,
