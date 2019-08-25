@@ -119,7 +119,7 @@ var ivaPagado = function(req, res) {
                 code: 401
             })
         } else {
-            IP = datos[0]
+            IP = datos[0][0]['IvaPagado']
             res.status(200).json(datos);
             console.log(IP);
         }
