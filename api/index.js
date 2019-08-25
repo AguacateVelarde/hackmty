@@ -3,8 +3,10 @@ const router = Router()
 const loginApi = require('./auth/login.js')
 const { clienteApi, mejorCliente, gastoGrande, proovedorGrande, ivaCobrado, ivaPagado } = require('./aeq/perfil.js')
 const { getGastos, getVentas, getGanancias, numProvedores } = require('./aeq/factura.js')
-    /*const refresher = require( './auth/refresher.js')
-    const { register, verifyUnique } = require('./auth/register.js')*/
+const { topClientes } = require('./lucia/cliente.js')
+
+/*const refresher = require( './auth/refresher.js')
+const { register, verifyUnique } = require('./auth/register.js')*/
 
 router.post('/login', loginApi)
     /*router.post( '/token', refresher )
@@ -31,4 +33,6 @@ router.get('/getGastos', getGastos)
 router.get('/getVentas', getVentas)
 router.get('/getGanancias', getGanancias)
 router.get('/numProve', numProvedores)
+    //Página de Clientes
+router.get('/topClientes', topClientes)
 module.exports = router;
