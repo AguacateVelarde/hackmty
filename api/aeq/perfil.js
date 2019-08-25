@@ -13,12 +13,7 @@ var IC;
 var ventaGrande = function(req, res) {
     console.log("Entre");
     var { user } = req.payload
-    db.select('receptorrfc', 'emisorname', 'total').
-    from('clientes').
-    whereNotNull('emisorname').
-    andWhere('emisorname', '<>', " ").
-    andWhere('receptorrfc', '=', user.rfc).
-    orderByRaw('total desc').
+    db.raw('select receptorrfc, emisorname, total from clientes where (receptorrfc = "' + user.rfc + '" and emisorname is not null and emisorname <> " ") order by total desc limit 1;').
     then(datos => {
         if (datos.length === 0) {
             return res.status(401).json({
@@ -166,6 +161,40 @@ var ivaAPagar = function(req, res) {
             })
         }
     });
+}
+var perfil = function(req, res) {
+    var mejCli;
+    var mejCliMount;
+    console.log("Entre al mejor Cliente");
+    var { user } = req.payload
+    db.raw('select emisorname, sum(total) as TotalClientes from clientes where receptorrfc = "' + user.rfc + '" group by emisorname order by TotalClientes desc limit 1').
+    then(datos => {
+        if (datos.length === 0) {
+            return res.status(401).json({
+                message: 'User don\'t foud',
+                code: 401
+            })
+        } else {
+            mejCli = datos[0][0]['emisorname'];
+            mejCliMount = datos[0][0]['TotalClientes'];
+            db.select('receptorrfc', 'emisorname', 'total').
+            from('clientes').
+            whereNotNull('emisorname').
+            andWhere('emisorname', '<>', " ").
+            andWhere('receptorrfc', '=', user.rfc).
+            orderByRaw('total desc').
+            then(datos => {
+                if (datos.length === 0) {
+                    return res.status(401).json({
+                        message: 'User don\'t foud',
+                        code: 401
+                    })
+                } else {
+                    res.status(200).json(datos);
+                }
+            })
+        }
+    })
 }
 module.exports = {
     mejorCliente,

@@ -85,7 +85,11 @@ var numProvedores = function(req, res) {
                 code: 401
             })
         } else {
-            res.status(200).json(datos);
+            var dato = datos[0][0]['NumProvedores'];
+            var envio = {
+                "NumProvedores": dato
+            }
+            res.status(200).json(envio);
         }
     });
 };
