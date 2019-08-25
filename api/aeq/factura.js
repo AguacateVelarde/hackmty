@@ -41,7 +41,7 @@ var getVentas = function(req, res) {
             console.log(ventas);
         }
     });
-}
+};
 var getGanancias = function(req, res) {
     var { user } = req.payload
     db.raw('select sum(total) as GastosTotales from clientes where emisorrfc = "' + user.rfc + '"').
@@ -72,10 +72,10 @@ var getGanancias = function(req, res) {
             });
         }
     });
-}
+};
 var numProvedores = function(req, res) {
     var { user } = req.payload;
-    db.raw('select count(emisorrfc) as NumProvedores from clientes where receptorrfc = "' + user.rfc + '"').
+    db.raw('select count(receptorrfc) as NumProvedores from clientes where emisorrfc = "' + user.rfc + '"').
     then(datos => {
         if (datos.length === 0) {
             return res.status(401).json({
@@ -86,7 +86,7 @@ var numProvedores = function(req, res) {
             res.status(200).json(datos);
         }
     });
-}
+};
 
 module.exports = {
     getGastos,
