@@ -33,13 +33,7 @@ var ventaGrande = function(req, res) {
 var mejorCliente = function(req, res) {
     console.log("Entre al mejor Cliente");
     var { user } = req.payload
-    db.select('receptorname').
-    count('receptorname as numVentas').
-    from('clientes').
-    whereNotNull('receptorname').
-    andWhere('receptorname', '<>', " ").
-    groupBy('receptorname').
-    orderByRaw('numVentas desc').
+    db.raw('select emisorname, sum(total) as TotalClientes from clientes where receptorrfc = "' + user.rfc + '" group by emisorname order by TotalClientes desc limit 1').
     then(datos => {
         if (datos.length === 0) {
             return res.status(401).json({
